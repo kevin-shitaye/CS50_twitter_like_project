@@ -1,8 +1,26 @@
 {% extends "network/layout.html" %} {% block body %}
-<div id="side"></div>
+<div class="row">
+  <div id="side" class="col-3">
+    <h2>kevin shitaye</h2>
+  </div>
+  <div class="col-6">
+    <h2>New post</h2>
+    <form>
+      <div class="form-group">
+        <textarea
+          class="form-control"
+          name="content"
+          id="content"
+          cols="30"
+          rows="5"
+        ></textarea>
+      </div>
+      <input class="btn btn-primary" type="button" id="post" value="Post" />
+    </form>
+    <div id="tweets"></div>
+  </div>
 
-<div id="all_tweets"></div>
-<div id="profile_page"></div>
-<div id="following_page"></div>
+  <div class="col-2">Ads</div>
+</div>
 
-d {% endblock %}
+{% endblock %}

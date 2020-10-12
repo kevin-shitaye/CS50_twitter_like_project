@@ -70,9 +70,8 @@ def post(request):
     data = json.loads(request.body)
 
     tweet = Tweet(
-        user = request.user
-        content = data.get("content", "")
-        likes = 0
+        user = request.user,
+        content = data.get("content", ""),
     )
     tweet.save()
 

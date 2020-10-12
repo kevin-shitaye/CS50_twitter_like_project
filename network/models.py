@@ -10,7 +10,7 @@ class Tweet(models.Model):
     user = models.ForeignKey("User", on_delete=models.CASCADE, related_name="twitter")
     content = models.CharField(max_length=500)
     date = models.DateTimeField(default=datetime.now())
-    likes = models.IntegerField()
+    likes = models.ManyToManyField("User", related_name="likes")
 
     def sterilize(self):
         return {
