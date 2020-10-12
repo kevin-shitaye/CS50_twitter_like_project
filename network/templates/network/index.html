@@ -1,4 +1,4 @@
-{% extends "network/layout.html" %} {% block body %}
+{% extends "network/layout.html" %} {% load static %} {% block body %}
 <div class="row">
   <div id="side" class="col-3">
     <h2>kevin shitaye</h2>
@@ -6,6 +6,7 @@
   <div class="col-6">
     <h2>New post</h2>
     <form>
+      {% csrf_token %}
       <div class="form-group">
         <textarea
           class="form-control"
@@ -23,4 +24,6 @@
   <div class="col-2">Ads</div>
 </div>
 
+{% endblock %} {% block script %}
+<script src="{% static 'network/index.js' %}"></script>
 {% endblock %}

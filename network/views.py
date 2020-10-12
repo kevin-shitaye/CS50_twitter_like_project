@@ -4,6 +4,9 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.http import JsonResponse
+import json
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 
 from .models import User, Tweet, Follow
 
@@ -63,23 +66,25 @@ def register(request):
     else:
         return render(request, "network/register.html")
 
+@csrf_exempt
+@login_required
 def post(request):
     if request.method != "POST":
         return JsonResponse({"error": "POST request required."}, status=400)
     
-    data = json.loads(request.body)
+    data = json.loads(request.body)['content']
 
     tweet = Tweet(
         user = request.user,
-        content = data.get("content", ""),
+        content = data
     )
     tweet.save()
 
-    return JsonResponse({"sucess": "Tweet made."}, status=400)
+    return JsonResponse({"sucess": "Tweet made."}, status=201)
 
 def tweets(request, page):
     tweets = Tweet.objects.all()
-    # getting tweets accordingly  
+    # getting tweets accordingly 
     if page == "profile_page":
         tweets = Tweet.objects.filter(
             user = request.user
