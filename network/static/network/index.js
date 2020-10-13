@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function post() {
   const content = document.querySelector("#content").value;
+  document.querySelector("#content").value = "";
 
   fetch("post", {
     method: "POST",

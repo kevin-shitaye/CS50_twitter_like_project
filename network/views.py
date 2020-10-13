@@ -71,32 +71,50 @@ def register(request):
 def post(request):
     if request.method != "POST":
         return JsonResponse({"error": "POST request required."}, status=400)
-    
-    data = json.loads(request.body)['content']
 
+    data = json.loads(request.body)['content']
     tweet = Tweet(
         user = request.user,
         content = data
     )
     tweet.save()
 
-    return JsonResponse({"sucess": "Tweet made."}, status=201)
+    return JsonResponse({"success": "Tweet made."}, status=201)
 
 def tweets(request, page):
-    tweets = Tweet.objects.all()
-    # getting tweets accordingly 
-    if page == "profile_page":
+    # getting tweets accordingly
+    if page == "all":
+        tweets = Tweet.objects.all() 
+    elif page == "profile_page":
         tweets = Tweet.objects.filter(
             user = request.user
         )
     elif page == "following_page":
-        tweets = Tweet.objects.filter(
-            user__in = Follow.objects.filter(following=request.user)
-        )
+        following = []
+        for i in Follow.objects.filter(follower=request.user):
+            following.append(i.following)
+        tweets = Tweet.objects.filter(user__in=following)
     else:
-        return JsonResponse({"error": "Invalid mailbox."}, status=400)
+        return JsonResponse({"error": "Invalid request."}, status=400)
 
     # ordering the tweets
-    tweets = tweet.order_by("-date").all()
+    tweets = tweets.order_by("-date").all()
 
-    return JsonResponse([tweets.sterilize() for tweet in tweets], safe=False)
+    return JsonResponse([tweet.serialize() for tweet in tweets], safe=False)
+
+
+
+@csrf_exempt
+@login_required
+def put(request, id):
+    # querying for Tweet
+    try:
+        tweet = Tweet.objects.get(pk=id)
+    except Tweet.DoesNotExist:
+        return jsonResponse({"error": "Tweet does not exist"}, status=404)
+
+    if request.method == 'PUT':
+        data = json.loads(request.body)
+        if data["content"] is not None:
+            tweet.content = data["content"]
+            

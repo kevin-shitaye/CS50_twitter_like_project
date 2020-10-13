@@ -10,14 +10,14 @@ class Tweet(models.Model):
     user = models.ForeignKey("User", on_delete=models.CASCADE, related_name="twitter")
     content = models.CharField(max_length=500)
     date = models.DateTimeField(default=datetime.now())
-    likes = models.ManyToManyField("User", blank=True, related_name="likes")
+    likes = models.ManyToManyField("User",blank=True, related_name="liked_by")
 
-    def sterilize(self):
+    def serialize(self):
         return {
-            "user":self.user,
-            "content":self.content,
-            "date":self.date,
-            "likes":self.likes
+            "user": self.user.id,
+            "content": self.content,
+            "date": self.date,
+            "likes": [user.id for user in self.likes.all()]
         }
 
 class Follow(models.Model):
