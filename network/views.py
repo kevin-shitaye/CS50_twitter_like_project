@@ -81,6 +81,8 @@ def post(request):
 
     return JsonResponse({"success": "Tweet made."}, status=201)
 
+@csrf_exempt
+@login_required
 def tweets(request, page):
     # getting tweets accordingly
     if page == "all":
@@ -106,15 +108,46 @@ def tweets(request, page):
 
 @csrf_exempt
 @login_required
-def put(request, id):
+def update(request, id):
     # querying for Tweet
     try:
         tweet = Tweet.objects.get(pk=id)
     except Tweet.DoesNotExist:
-        return jsonResponse({"error": "Tweet does not exist"}, status=404)
+        return JsonResponse({"error": "Tweet does not exist"}, status=404)
 
     if request.method == 'PUT':
         data = json.loads(request.body)
         if data["content"] is not None:
             tweet.content = data["content"]
-            
+        elif data["like"] is not None:
+            if request.user not in tweet.likes:
+                tweet.likes.add(request.user)
+            else:
+                tweet.likes.remove(request.user)
+        return JsonResponse({"error": "PUT method is none"})
+    else:
+        return JsonResponse({"error": "PUT method required"})
+
+@csrf_exempt
+@login_required
+def follow(request, id):
+    # getting the user
+    try:
+        user = User.objects.get(pk=id)
+    except User.DoesNotExist:
+        return JsonResponse({"error": "User does not exist"}, status=404)
+    fol = Follow.objects.filter(follower=request.user, following=user)
+    if request.method == "POST":
+        # checking if already followed
+        if fol:
+            fol.delete()
+        else:
+            fol = Follow(follower=request.user, following=user)
+            fol.save()
+    elif request.method == "GET":
+        if fol:
+            return JsonResponse({"followed": True})
+        else:
+            return JsonResponse({"followed": False})
+    else:
+        return JsonResponse({"error": "POST/GET method required"})

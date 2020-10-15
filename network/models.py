@@ -3,7 +3,7 @@ from django.db import models
 from datetime import datetime
 
 class User(AbstractUser):
-    pass
+    fol = models.ManyToManyField("User", blank=True, related_name="followed_by")
 
 
 class Tweet(models.Model):
