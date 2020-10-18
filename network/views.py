@@ -134,16 +134,22 @@ def follow(request, id):
     except User.DoesNotExist:
         return JsonResponse({"error": "User does not exist"}, status=404)
 
-    if request.method == "POST":
+    if request.method == "PUT":
         # checking if already followed
         if user in list(request.user.following.all()):
             request.user.following.remove(user)
         else:
             request.user.following.add(user)
     elif request.method == "GET":
+        following = []
+        followers = []
+        for i in user.followers.all():
+            followers.append(i.id)
+        for i in user.following.all():
+            following.append(i.id) 
         return JsonResponse({
-            "followers": list(user.followers.all()),
-            "following": list(user.following.all())
+            "followers": followers,
+            "following": following
         })
     else:
         return JsonResponse({"error": "POST/GET method required"})

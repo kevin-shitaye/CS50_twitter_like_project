@@ -7,6 +7,7 @@ class User(AbstractUser):
     following =  models.ManyToManyField("User", blank=True, related_name="following_others")
 
 
+
 class Tweet(models.Model):
     user = models.ForeignKey("User", on_delete=models.CASCADE, related_name="twitter")
     content = models.CharField(max_length=500)
