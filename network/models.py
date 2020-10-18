@@ -3,7 +3,8 @@ from django.db import models
 from datetime import datetime
 
 class User(AbstractUser):
-    fol = models.ManyToManyField("User", blank=True, related_name="followed_by")
+    followers =  models.ManyToManyField("User", blank=True, related_name="followed_by")
+    following =  models.ManyToManyField("User", blank=True, related_name="following_others")
 
 
 class Tweet(models.Model):
@@ -20,6 +21,4 @@ class Tweet(models.Model):
             "likes": [user.id for user in self.likes.all()]
         }
 
-class Follow(models.Model):
-    follower = models.ForeignKey("User", on_delete=models.CASCADE, related_name="follower")
-    following = models.ForeignKey("User", on_delete=models.CASCADE, related_name="following")
+

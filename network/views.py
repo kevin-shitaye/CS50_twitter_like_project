@@ -8,7 +8,7 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 
-from .models import User, Tweet, Follow
+from .models import User, Tweet
 
 
 def index(request):
@@ -92,10 +92,7 @@ def tweets(request, page):
             user = request.user
         )
     elif page == "following_page":
-        following = []
-        for i in Follow.objects.filter(follower=request.user):
-            following.append(i.following)
-        tweets = Tweet.objects.filter(user__in=following)
+        tweets = Tweet.objects.filter(user__in = request.user.following.all())
     else:
         return JsonResponse({"error": "Invalid request."}, status=400)
 
@@ -136,18 +133,21 @@ def follow(request, id):
         user = User.objects.get(pk=id)
     except User.DoesNotExist:
         return JsonResponse({"error": "User does not exist"}, status=404)
-    fol = Follow.objects.filter(follower=request.user, following=user)
+
     if request.method == "POST":
         # checking if already followed
-        if fol:
-            fol.delete()
+        if user in list(request.user.following.all()):
+            request.user.following.remove(user)
         else:
-            fol = Follow(follower=request.user, following=user)
-            fol.save()
+            request.user.following.add(user)
     elif request.method == "GET":
-        if fol:
-            return JsonResponse({"followed": True})
-        else:
-            return JsonResponse({"followed": False})
+        return JsonResponse({
+            "followers": list(user.followers.all()),
+            "following": list(user.following.all())
+        })
     else:
         return JsonResponse({"error": "POST/GET method required"})
+
+
+
+
