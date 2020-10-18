@@ -1,0 +1,10 @@
+#name {
+  display: inline;
+}
+#badge {
+  display: block;
+}
+
+#side {
+  height: 150px;
+}

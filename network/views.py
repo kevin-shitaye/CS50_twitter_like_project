@@ -12,7 +12,9 @@ from .models import User, Tweet
 
 
 def index(request):
-    return render(request, "network/index.html")
+    return render(request, "network/index.html", {
+        "user": request.user
+    })
 
 
 def login_view(request):

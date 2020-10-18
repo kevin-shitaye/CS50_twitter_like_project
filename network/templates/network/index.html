@@ -1,9 +1,28 @@
 {% extends "network/layout.html" %} {% load static %} {% block body %}
 <div class="row">
-  <div id="side" class="col-3">
-    <h2>kevin shitaye</h2>
+  {% if user.is_authenticated %}
+  <div id="side" class="col-md-3 shadow m-2 mt-4 p-4">
+    <img
+      src="https://static.thenounproject.com/png/630740-200.png"
+      alt="profile picture"
+      width="40px"
+      id="profile_pic"
+    />
+    <p id="name">{{request.user}}</p>
+    <div class="m-1">
+      <span class="badge-info p-1"
+        >{{ request.user.followers.all|length }} Followers</span
+      >
+      <span class="badge-info p-1"
+        >{{ request.user.following.all|length }} Following</span
+      >
+    </div>
   </div>
-  <div class="col-6">
+  {% endif %}
+  <div class="col-md-6 m-2 shadow">
+    <div id="msg" class="alert alert-success" style="display: none">
+      <strong>Tweet made!!!</strong>
+    </div>
     <h2>New post</h2>
     <form>
       {% csrf_token %}
@@ -13,7 +32,7 @@
           name="content"
           id="content"
           cols="30"
-          rows="5"
+          rows="3"
         ></textarea>
       </div>
       <input class="btn btn-primary" type="button" id="post" value="Post" />
@@ -21,7 +40,7 @@
     <div id="tweets"></div>
   </div>
 
-  <div class="col-2">Ads</div>
+  <div class="col-1">Ads</div>
 </div>
 
 {% endblock %} {% block script %}
