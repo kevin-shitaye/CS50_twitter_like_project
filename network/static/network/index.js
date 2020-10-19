@@ -20,19 +20,30 @@ function loadPage(page) {
       // make the tweet box
       tweets.forEach((tweet) => {
         const tweet_div = document.createElement("div");
-        tweet_div.innerHTML = `<div class="border p-2 m-2">
-        <img
-          src="https://static.thenounproject.com/png/630740-200.png"
-          alt="profile picture"
-          width="40px"
-        />
-        <strong>${tweet.user}</strong>
+        tweet_div.classList.add("border", "p-2", "m-1");
+        tweet_div.innerHTML = `
+        <i class="fas fa-user-circle m-2" id="profile_pic"></i>
+        <strong id="name">${tweet.user}</strong>
         <p>${tweet.date}</p>
         <p>
           ${tweet.content}
-        </p>
-        <span><3 ${tweet.likes.length}</span>
-      </div>`;
+        </p>`;
+
+        const like = document.createElement("i");
+        like.innerHTML = tweet.likes.length;
+        like.classList.add("far", "fa-heart");
+        like.style.color = "gray";
+        like.id = tweet.id;
+        like.addEventListener("click", liked);
+        tweet_div.append(like);
+
+        const user_id = document.querySelector("#name").dataset.id;
+        tweet.likes.forEach((user) => {
+          if (parseInt(user_id) === user) {
+            like.classList.add("far", "fa-heart");
+            like.style.color = "red";
+          }
+        });
 
         document.querySelector("#tweets").append(tweet_div);
       });
@@ -50,8 +61,24 @@ function post() {
     }),
   })
     .then((response) => response.json())
-    .then((result) => {
+    .then((tweet) => {
       document.querySelector("#msg").style.display = "block";
-      console.log("tweeted!!!");
+      console.log(tweet);
     });
+}
+
+function liked(e) {
+  if (e.target.style.color !== "red") {
+    e.target.style.color = "red";
+    e.target.innerHTML++;
+  } else {
+    e.target.style.color = "gray";
+    e.target.innerHTML--;
+  }
+  fetch(`/update/${e.target.id}`, {
+    method: "PUT",
+    body: JSON.stringify({
+      like: true,
+    }),
+  });
 }

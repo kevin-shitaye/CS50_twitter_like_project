@@ -99,7 +99,7 @@ def tweets(request, page):
         return JsonResponse({"error": "Invalid request."}, status=400)
 
     # ordering the tweets
-    tweets = tweets.order_by("-date").all()
+    tweets = tweets.order_by("-id").all()
 
     return JsonResponse([tweet.serialize() for tweet in tweets], safe=False)
 
@@ -116,13 +116,14 @@ def update(request, id):
 
     if request.method == 'PUT':
         data = json.loads(request.body)
-        if data["content"] is not None:
-            tweet.content = data["content"]
-        elif data["like"] is not None:
-            if request.user not in tweet.likes:
+        if data.get("like") is not None:
+            if request.user not in tweet.likes.all():
                 tweet.likes.add(request.user)
             else:
                 tweet.likes.remove(request.user)
+        if data.get("content") is not None:
+            tweet.content = data["content"]
+       
         return JsonResponse({"error": "PUT method is none"})
     else:
         return JsonResponse({"error": "PUT method required"})

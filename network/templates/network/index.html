@@ -2,13 +2,8 @@
 <div class="row">
   {% if user.is_authenticated %}
   <div id="side" class="col-md-3 shadow m-2 mt-4 p-4">
-    <img
-      src="https://static.thenounproject.com/png/630740-200.png"
-      alt="profile picture"
-      width="40px"
-      id="profile_pic"
-    />
-    <p id="name">{{request.user}}</p>
+    <i class="fas fa-user-circle m-2" id="profile_pic"></i>
+    <strong id="name" data-id="{{ request.user.id }}">{{request.user}}</strong>
     <div class="m-1">
       <span class="badge-info p-1"
         >{{ request.user.followers.all|length }} Followers</span

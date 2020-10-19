@@ -1,5 +1,6 @@
 #name {
   display: inline;
+  font-size: 20px;
 }
 #badge {
   display: block;
@@ -7,4 +8,14 @@
 
 #side {
   height: 150px;
+}
+
+body i {
+  font-family: "FontAwesome" !important;
+  font-style: normal;
+}
+
+#profile_pic {
+  color: skyblue;
+  font-size: 35px;
 }
