@@ -12,9 +12,18 @@ from .models import User, Tweet
 
 
 def index(request):
-    return render(request, "network/index.html", {
+    # Authenticated users
+    if request.user.is_authenticated:
+        return render(request, "network/index.html", {
         "user": request.user
     })
+
+    # Everyone else is prompted to sign in
+    else:
+        return HttpResponseRedirect(reverse("login"))
+
+
+
 
 
 def login_view(request):
@@ -103,6 +112,14 @@ def tweets(request, page):
 
     return JsonResponse([tweet.serialize() for tweet in tweets], safe=False)
 
+@csrf_exempt
+@login_required
+def tweets_of(request, id):
+    if request.method == "GET":
+        tweets = Tweet.objects.filter(user=User.objects.get(pk=id))
+        return JsonResponse([tweet.serialize() for tweet in tweets], safe=False)
+    else:
+        return JsonResponse({"error": "Invalid request."}, status=400)
 
 
 @csrf_exempt
@@ -139,20 +156,14 @@ def follow(request, id):
 
     if request.method == "PUT":
         # checking if already followed
-        if user in list(request.user.following.all()):
+        if user in request.user.following.all():
             request.user.following.remove(user)
         else:
             request.user.following.add(user)
     elif request.method == "GET":
-        following = []
-        followers = []
-        for i in user.followers.all():
-            followers.append(i.id)
-        for i in user.following.all():
-            following.append(i.id) 
         return JsonResponse({
-            "followers": followers,
-            "following": following
+            "followers": [follower.serialize() for follower in user.followers.all()],
+            "following": [following.serialize() for following in user.following.all()]
         })
     else:
         return JsonResponse({"error": "POST/GET method required"})

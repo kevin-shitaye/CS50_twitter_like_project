@@ -7,6 +7,14 @@ class User(AbstractUser):
     following =  models.ManyToManyField("User", blank=True, related_name="following_others")
 
 
+    def serialize(self):
+        return {
+            "id": self.id,
+            "username": self.username,
+            "followers": [follower.username for follower in self.followers.all()],
+            "following": [following.username for following in self.following.all()]
+            }
+
 
 class Tweet(models.Model):
     user = models.ForeignKey("User", on_delete=models.CASCADE, related_name="twitter")
@@ -17,6 +25,7 @@ class Tweet(models.Model):
     def serialize(self):
         return {
             "id": self.id,
+            "user_id": self.user.id,
             "user": self.user.username,
             "content": self.content,
             "date": self.date,

@@ -9,43 +9,43 @@ document.addEventListener("DOMContentLoaded", function () {
     .querySelector("#following")
     .addEventListener("click", () => loadPage("following_page"));
   document.querySelector("#post").addEventListener("click", post);
+  document.querySelector("#name").addEventListener("click", profilePage);
   loadPage("all");
 });
 
 function loadPage(page) {
   document.querySelector("#tweets").innerHTML = "";
-  fetch(`/tweet/${page}`)
+  document.querySelector("#profile_view").style.display = "none";
+
+  document.querySelector("#main_view").style.display = "block";
+  url = `tweet/${page}`;
+
+  fetch(url)
     .then((response) => response.json())
     .then((tweets) => {
       // make the tweet box
       tweets.forEach((tweet) => {
-        const tweet_div = document.createElement("div");
-        tweet_div.classList.add("border", "p-2", "m-1");
-        tweet_div.innerHTML = `
-        <i class="fas fa-user-circle m-2" id="profile_pic"></i>
-        <strong id="name">${tweet.user}</strong>
-        <p>${tweet.date}</p>
-        <p>
-          ${tweet.content}
-        </p>`;
+        const box = tweet_box(tweet);
+        box
+          .getElementsByTagName("strong")[0]
+          .addEventListener("click", profilePage);
+        document.querySelector("#tweets").append(box);
+      });
+    });
+}
 
-        const like = document.createElement("i");
-        like.innerHTML = tweet.likes.length;
-        like.classList.add("far", "fa-heart");
-        like.style.color = "gray";
-        like.id = tweet.id;
-        like.addEventListener("click", liked);
-        tweet_div.append(like);
+function profilePage(e) {
+  document.querySelector("#tweets_of").innerHTML = "";
+  document.querySelector("#main_view").style.display = "none";
+  document.querySelector("#profile_view").style.display = "block";
 
-        const user_id = document.querySelector("#name").dataset.id;
-        tweet.likes.forEach((user) => {
-          if (parseInt(user_id) === user) {
-            like.classList.add("far", "fa-heart");
-            like.style.color = "red";
-          }
-        });
-
-        document.querySelector("#tweets").append(tweet_div);
+  document.querySelector("#profile_name").innerHTML = e.target.dataset.user;
+  fetch(`tweetsOf/${e.target.dataset.id}`)
+    .then((response) => response.json())
+    .then((tweets) => {
+      tweets.forEach((tweet) => {
+        const box = tweet_box(tweet);
+        document.querySelector("#tweets_of").append(box);
       });
     });
 }
@@ -63,7 +63,9 @@ function post() {
     .then((response) => response.json())
     .then((tweet) => {
       document.querySelector("#msg").style.display = "block";
+      loadPage("all");
       console.log(tweet);
+      document.querySelector("#msg").style.display = "none";
     });
 }
 
@@ -75,10 +77,55 @@ function liked(e) {
     e.target.style.color = "gray";
     e.target.innerHTML--;
   }
+  if (e.target.innerHTML > 1) {
+    e.target.nextSibling.innerHTML = "likes";
+  } else {
+    e.target.nextSibling.innerHTML = "like";
+  }
   fetch(`/update/${e.target.id}`, {
     method: "PUT",
     body: JSON.stringify({
       like: true,
     }),
   });
+}
+
+function tweet_box(tweet) {
+  const tweet_div = document.createElement("div");
+
+  tweet_div.classList.add("border", "p-3", "mt-3", "shadow");
+  tweet_div.innerHTML = `
+  <i class="fas fa-user-circle m-2" id="profile_pic"></i>
+  <strong id="name" data-id="${tweet.user_id}" data-user="${tweet.user}">${tweet.user}</strong>
+  <p>${tweet.date}</p>
+  <p>
+    ${tweet.content}
+  </p>`;
+
+  const like = document.createElement("i");
+
+  const like_word = document.createElement("p");
+  like_word.id = "like_word";
+  if (tweet.likes.length < 2) {
+    like_word.innerHTML = "like";
+  } else {
+    like_word.innerHTML = "likes";
+  }
+
+  like.innerHTML = tweet.likes.length;
+  like.classList.add("far", "fa-heart", "ml-2");
+  like.style.color = "gray";
+  like.id = tweet.id;
+  like.addEventListener("click", liked);
+  tweet_div.append(like);
+  tweet_div.append(like_word);
+
+  const user_id = document.querySelector("#name").dataset.id;
+  tweet.likes.forEach((user) => {
+    if (parseInt(user_id) === user) {
+      like.classList.add("far", "fa-heart");
+      like.style.color = "red";
+    }
+  });
+  return tweet_div;
 }

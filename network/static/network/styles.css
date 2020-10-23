@@ -19,3 +19,16 @@ body i {
   color: skyblue;
   font-size: 35px;
 }
+
+#like_word {
+  display: inline;
+  margin-left: 2px;
+  color: gray;
+  font-weight: bold;
+  font-style: italic;
+}
+
+#profile_name {
+  color: black;
+  margin-left: 5px;
+}

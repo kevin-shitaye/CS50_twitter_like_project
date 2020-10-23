@@ -1,41 +1,72 @@
 {% extends "network/layout.html" %} {% load static %} {% block body %}
-<div class="row">
-  {% if user.is_authenticated %}
-  <div id="side" class="col-md-3 shadow m-2 mt-4 p-4">
-    <i class="fas fa-user-circle m-2" id="profile_pic"></i>
-    <strong id="name" data-id="{{ request.user.id }}">{{request.user}}</strong>
-    <div class="m-1">
-      <span class="badge-info p-1"
-        >{{ request.user.followers.all|length }} Followers</span
+<div id="main_view">
+  <div class="row">
+    {% if user.is_authenticated %}
+    <div id="side" class="col-md-3 shadow m-2 mt-4 p-4">
+      <i class="fas fa-user-circle m-2" id="profile_pic"></i>
+      <strong
+        id="name"
+        data-id="{{ request.user.id }}"
+        data-user="{{ request.user }}"
+        >{{request.user}}</strong
       >
-      <span class="badge-info p-1"
-        >{{ request.user.following.all|length }} Following</span
-      >
-    </div>
-  </div>
-  {% endif %}
-  <div class="col-md-6 m-2 shadow">
-    <div id="msg" class="alert alert-success" style="display: none">
-      <strong>Tweet made!!!</strong>
-    </div>
-    <h2>New post</h2>
-    <form>
-      {% csrf_token %}
-      <div class="form-group">
-        <textarea
-          class="form-control"
-          name="content"
-          id="content"
-          cols="30"
-          rows="3"
-        ></textarea>
+      <div class="m-1">
+        <span class="badge badge-primary badge-pills p-1"
+          >Followers {{ request.user.followers.all|length }}
+        </span>
+        <span class="badge badge-primary badge-pills p-1"
+          >Following {{ request.user.following.all|length }}
+        </span>
       </div>
-      <input class="btn btn-primary" type="button" id="post" value="Post" />
-    </form>
-    <div id="tweets"></div>
-  </div>
+    </div>
+    {% endif %}
+    <div class="col-md-7 m-2">
+      <div id="msg" class="alert alert-success" style="display: none">
+        <strong>Tweet made!!!</strong>
+      </div>
+      <h2>New post</h2>
+      <form>
+        {% csrf_token %}
+        <div class="form-group">
+          <textarea
+            class="form-control"
+            name="content"
+            id="content"
+            cols="30"
+            rows="3"
+          ></textarea>
+        </div>
+        <input
+          class="btn btn-primary form-control"
+          type="button"
+          id="post"
+          value="Post"
+        />
+      </form>
+      <div id="tweets"></div>
+    </div>
 
-  <div class="col-1">Ads</div>
+    <div class="col-1">Ads</div>
+  </div>
+</div>
+
+<!-- this view for profile pages -->
+<div class="row" id="profile_view">
+  <div class="col-md-8 shadow mx-auto">
+    <i class="fas fa-user-circle m-2" id="profile_pic"
+      ><strong id="profile_name"></strong
+    ></i>
+    <strong id="name"></strong>
+    <div class="m-1">
+      <span class="badge badge-primary badge-pills p-1">Followers </span>
+      <span class="badge badge-primary badge-pills p-1">Following </span>
+      <span id="follow_button" class="badge badge-danger badge-pills p-1"
+        >Unfollow</span
+      >
+      <hr />
+      <div id="tweets_of"></div>
+    </div>
+  </div>
 </div>
 
 {% endblock %} {% block script %}
